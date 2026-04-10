@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/<your-username>/gitops-incident-simulation
+    repoURL: https://github.com/paragjo/gitops-incident-simulation
     targetRevision: HEAD
     path: gitops/base/demo-app/helm/demo-app
 
