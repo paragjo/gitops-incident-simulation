@@ -3,22 +3,26 @@ grafana:
   service:
     type: NodePort
 
-  readinessProbe:
-    initialDelaySeconds: 60
-    timeoutSeconds: 10
+  sidecar:
+    dashboards:
+      enabled: false
+    datasources:
+      enabled: false
 
-  livenessProbe:
-    initialDelaySeconds: 120
-    timeoutSeconds: 10
+  resources:
+    requests:
+      memory: 150Mi
+    limits:
+      memory: 300Mi
 
 prometheus:
   prometheusSpec:
     retention: 6h
     resources:
       requests:
-        memory: 400Mi
+        memory: 300Mi
       limits:
-        memory: 800Mi
+        memory: 600Mi
 
 alertmanager:
   alertmanagerSpec:
