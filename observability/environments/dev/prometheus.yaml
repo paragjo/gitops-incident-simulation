@@ -12,7 +12,7 @@ spec:
     path: observability/base/prometheus/helm/prometheus-stack
     helm:
       valueFiles:
-        - ../values/dev-values.yaml
+        - dev-values.yaml
 
   destination:
     server: https://kubernetes.default.svc
