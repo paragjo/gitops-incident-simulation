@@ -3,6 +3,14 @@ grafana:
   service:
     type: NodePort
 
+  readinessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 10
+
+  livenessProbe:
+    initialDelaySeconds: 120
+    timeoutSeconds: 10
+
 prometheus:
   prometheusSpec:
     retention: 6h
