@@ -1,0 +1,31 @@
+grafana:
+  adminPassword: admin
+  service:
+    type: NodePort
+
+prometheus:
+  prometheusSpec:
+    retention: 6h
+    resources:
+      requests:
+        memory: 400Mi
+      limits:
+        memory: 800Mi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        memory: 100Mi
+      limits:
+        memory: 200Mi
+
+kube-state-metrics:
+  resources:
+    requests:
+      memory: 100Mi
+
+nodeExporter:
+  resources:
+    requests:
+      memory: 50Mi
