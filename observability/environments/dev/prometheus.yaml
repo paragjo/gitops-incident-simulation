@@ -11,6 +11,7 @@ spec:
     targetRevision: HEAD
     path: observability/base/prometheus/helm/prometheus-stack
     helm:
+      skipCrds: true
       valueFiles:
         - dev-values.yaml
 
