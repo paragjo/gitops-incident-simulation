@@ -45,12 +45,26 @@ setInterval(() => {
 // ROUTES
 // ==============================
 
+// Middleware to count requests
+
+app.use((req, res, next) => {
+  httpRequestCounter.inc();
+  next();
+});
+
+
 // Root
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
     failureMode
   });
+});
+
+// Metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
 });
 
 // Health (used by probes)
