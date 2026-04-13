@@ -8,9 +8,9 @@ spec:
   project: default
 
   source:
-  repoURL: https://github.com/paragjo/gitops-incident-simulation
-  targetRevision: HEAD
-  path: observability/prometheus/base/manifests
+    repoURL: https://github.com/paragjo/gitops-incident-simulation
+    targetRevision: HEAD
+    path: observability/prometheus/base/manifests
 
 
   destination:
