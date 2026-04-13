@@ -4,9 +4,16 @@ const client = require("prom-client");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ==============================
+// PROMETHEUS SETUP (SAFE)
+// ==============================
 const register = new client.Registry();
-client.collectDefaultMetrics({ register });
 
+client.collectDefaultMetrics({
+  register,
+});
+
+// Custom metric
 const httpRequestCounter = new client.Counter({
   name: "http_requests_total",
   help: "Total number of HTTP requests",
@@ -14,10 +21,11 @@ const httpRequestCounter = new client.Counter({
 
 register.registerMetric(httpRequestCounter);
 
-// Read failure mode
+// ==============================
+// FAILURE MODES
+// ==============================
 const failureMode = process.env.FAILURE_MODE || "none";
 
-// Structured logger
 function log(level, message, extra = {}) {
   console.log(JSON.stringify({
     timestamp: new Date().toISOString(),
@@ -28,19 +36,14 @@ function log(level, message, extra = {}) {
   }));
 }
 
-// ==============================
-// 🔥 STARTUP FAILURE (CrashLoop)
-// ==============================
+// Crash loop
 if (failureMode === "crash-loop") {
   log("error", "Simulating crash loop on startup");
   process.exit(1);
 }
 
-// ==============================
-// 🔥 MEMORY LEAK SIMULATION
-// ==============================
+// Memory leak
 let memoryLeak = [];
-
 setInterval(() => {
   if (failureMode === "memory-leak") {
     const chunk = new Array(1000000).fill("leak");
@@ -53,16 +56,20 @@ setInterval(() => {
 }, 1000);
 
 // ==============================
-// ROUTES
+// MIDDLEWARE (SAFE)
 // ==============================
-
-// Middleware to count requests
-
 app.use((req, res, next) => {
-  httpRequestCounter.inc();
+  try {
+    httpRequestCounter.inc();
+  } catch (err) {
+    console.error("Metric error:", err);
+  }
   next();
 });
 
+// ==============================
+// ROUTES
+// ==============================
 
 // Root
 app.get("/", (req, res) => {
@@ -72,35 +79,24 @@ app.get("/", (req, res) => {
   });
 });
 
-// Metrics endpoint
-app.get("/metrics", async (req, res) => {
-  res.set("Content-Type", register.contentType);
-  res.end(await register.metrics());
-});
-
-// Health (used by probes)
+// Health
 app.get("/health", (req, res) => {
   if (failureMode === "health-fail") {
     log("error", "Health check failing intentionally");
     return res.status(500).send("NOT OK");
   }
-
   res.status(200).send("OK");
 });
 
-// API endpoint (simulate runtime issues)
+// API
 app.get("/api", async (req, res) => {
-  log("info", "Incoming request", {
-    path: "/api"
-  });
+  log("info", "Incoming request", { path: "/api" });
 
-  // 🔥 LATENCY
   if (failureMode === "latency") {
     log("warn", "Injecting latency");
     await new Promise(r => setTimeout(r, 3000));
   }
 
-  // 🔥 CPU SPIKE
   if (failureMode === "cpu-spike") {
     log("warn", "Simulating CPU spike");
     const end = Date.now() + 5000;
@@ -109,7 +105,6 @@ app.get("/api", async (req, res) => {
     }
   }
 
-  // 🔥 RUNTIME CRASH
   if (failureMode === "crash") {
     log("error", "Crashing on API request");
     process.exit(1);
@@ -119,6 +114,18 @@ app.get("/api", async (req, res) => {
     message: "Hello from demo app",
     failureMode
   });
+});
+
+// Metrics (SAFE)
+app.get("/metrics", async (req, res) => {
+  try {
+    res.set("Content-Type", register.contentType);
+    const metrics = await register.metrics();
+    res.end(metrics);
+  } catch (err) {
+    console.error("Metrics error:", err);
+    res.status(500).send("Metrics error");
+  }
 });
 
 // ==============================
