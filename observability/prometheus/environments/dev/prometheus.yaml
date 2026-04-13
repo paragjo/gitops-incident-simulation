@@ -8,36 +8,10 @@ spec:
   project: default
 
   source:
-    repoURL: https://prometheus-community.github.io/helm-charts
-    chart: prometheus
-    targetRevision: 25.8.0
+  repoURL: https://github.com/paragjo/gitops-incident-simulation
+  targetRevision: HEAD
+  path: observability/prometheus/base/manifests
 
-    helm:
-      values: |
-        server:
-          resources:
-            requests:
-              cpu: 100m
-              memory: 200Mi
-            limits:
-              cpu: 300m
-              memory: 400Mi
-          retention: "2h"
-
-        alertmanager:
-          enabled: false
-
-        pushgateway:
-          enabled: false
-
-        kube-state-metrics:
-          enabled: false
-
-        prometheus-node-exporter:
-          enabled: false
-      parameters:
-        - name: pushgateway.enabled
-          value: "false"
 
   destination:
     server: https://kubernetes.default.svc
