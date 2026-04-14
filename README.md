@@ -83,14 +83,14 @@ gitops-incident-simulation/
 
 ## ⚙️ Tech Stack
 
-* **Cloud**: GCP (GKE) / AWS (EKS)
+* **Cloud**: GCP (GKE) / AWS (EKS) (Most probably GKE TBD)
 * **Infrastructure**: Terraform
 * **Container Orchestration**: Kubernetes
 * **GitOps**: ArgoCD
-* **CI/CD**: GitLab CI
+* **CI/CD**: GitLab CI (Or Github Actions TBD)
 * **Monitoring**: Prometheus + Grafana
 * **Logging**: Loki
-* **Alerting**: Alertmanager
+* **Alerting**: Alertmanager (Currently disabled for local due to resource crunch)
 
 ---
 
@@ -98,7 +98,7 @@ gitops-incident-simulation/
 
 * [x] Kubernetes app deployment
 * [x] Failure simulation (memory leak, crashloop)
-* [ ] GitOps implementation (ArgoCD)
+* [x] GitOps implementation (ArgoCD)
 * [ ] Observability stack (Prometheus, Grafana, Loki)
 * [ ] Terraform-based cloud provisioning
 * [ ] Multi-environment setup
