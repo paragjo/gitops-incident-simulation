@@ -12,3 +12,6 @@ data:
       - job_name: "prometheus"
         static_configs:
           - targets: ["localhost:9090"]
+      - job_name: 'demo-app'
+        static_configs:
+          - targets: ["demo-app-dev-demo-app-chart.demo-app-dev.svc.cluster.local:3000"]
