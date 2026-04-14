@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/paragjo/gitops-incident-simulation
+    targetRevision: HEAD
+    path: observability/grafana/base/manifests
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
