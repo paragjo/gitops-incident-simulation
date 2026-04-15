@@ -17,4 +17,4 @@ data:
           - targets: ["demo-app-dev-demo-app-chart.demo-app-dev.svc.cluster.local:3000"]
       - job_name: 'node-exporter'
         static_configs:
-          - targets: ["172.18.0.2:9100"]
+          - targets: ["node-exporter-svc:9100"]
