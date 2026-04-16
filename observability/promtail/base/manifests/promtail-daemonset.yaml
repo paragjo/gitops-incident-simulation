@@ -31,6 +31,8 @@ spec:
               mountPath: /etc/promtail
             - name: varlog
               mountPath: /var/log
+            - name: containers
+              mountPath: /var/log/containers
 
       volumes:
         - name: config
@@ -39,3 +41,6 @@ spec:
         - name: varlog
           hostPath:
             path: /var/log
+        - name: containers
+          hostPath:
+            path: /var/log/containers
