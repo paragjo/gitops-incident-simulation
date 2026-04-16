@@ -20,21 +20,34 @@ data:
         kubernetes_sd_configs:
           - role: pod
 
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_name]
-            target_label: pod
 
+        relabel_configs:
+          # Only keep running pods
+          - action: keep
+            source_labels: [__meta_kubernetes_pod_phase]
+            regex: Running
+
+          # Namespace
           - source_labels: [__meta_kubernetes_namespace]
             target_label: namespace
 
+          # Pod name
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+
+          # Container name
           - source_labels: [__meta_kubernetes_pod_container_name]
             target_label: container
 
+          # Node
           - source_labels: [__meta_kubernetes_pod_node_name]
             target_label: node
 
+          # CRITICAL: Correct log path mapping
           - action: replace
-            replacement: /var/log/containers/*$1*.log
             source_labels:
+              - __meta_kubernetes_pod_uid
               - __meta_kubernetes_pod_container_name
+            separator: /
+            replacement: /var/log/pods/*$1/*.log
             target_label: __path__
