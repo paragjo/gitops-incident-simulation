@@ -25,12 +25,10 @@ data:
           - docker: {}
 
         relabel_configs:
-      # Keep only pods with logs
           - action: keep
             source_labels: [__meta_kubernetes_pod_name]
             regex: .+
 
-      # Attach labels
           - action: replace
             source_labels: [__meta_kubernetes_namespace]
             target_label: namespace
@@ -47,6 +45,16 @@ data:
             source_labels: [__meta_kubernetes_pod_node_name]
             target_label: node
 
+  # 🔥 CRITICAL (missing earlier)
+          - action: replace
+            source_labels: [__meta_kubernetes_pod_container_name]
+            target_label: job
+
+  # 🔥 Adds all pod labels
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+
+  # ✅ Path
           - action: replace
             replacement: /var/log/pods/*/*/*.log
             target_label: __path__
