@@ -48,6 +48,5 @@ data:
             target_label: node
 
           - action: replace
-            source_labels: [__meta_kubernetes_pod_uid]
+            replacement: /var/log/pods/*/*/*.log
             target_label: __path__
-            replacement: /var/log/pods/*$1/*/*.log
