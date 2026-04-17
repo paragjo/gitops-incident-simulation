@@ -25,10 +25,6 @@ data:
 
         relabel_configs:
           - action: keep
-            source_labels: [__meta_kubernetes_pod_node_name]
-            regex: parag-cluster-control-plane
-
-          - action: keep
             source_labels: [__meta_kubernetes_pod_name]
             regex: .+
 
