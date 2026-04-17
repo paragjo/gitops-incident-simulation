@@ -19,6 +19,10 @@ spec:
       containers:
         - name: promtail
           image: grafana/promtail:2.9.3
+
+          securityContext:
+            runAsUser: 0
+
           args:
             - -config.file=/etc/promtail/promtail.yaml
             - -log.level=debug
