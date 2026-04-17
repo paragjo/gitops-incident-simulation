@@ -96,10 +96,10 @@ gitops-incident-simulation/
 
 ## 🚦 Project Phases
 
-* [x] Kubernetes app deployment
-* [x] Failure simulation (memory leak, crashloop)
-* [x] GitOps implementation (ArgoCD)
-* [ ] Observability stack (Prometheus, Grafana, Loki)
+* [x] Kubernetes app deployment -- Tested on Local system
+* [x] Failure simulation (memory leak, crashloop) -- Tested on Local system
+* [x] GitOps implementation (ArgoCD) -- Tested on Local system
+* [x] Observability stack (Prometheus, Grafana, Loki) -- Tested on Local system
 * [ ] Terraform-based cloud provisioning
 * [ ] Multi-environment setup
 
