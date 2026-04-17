@@ -12,6 +12,8 @@ spec:
       labels:
         app: promtail
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       serviceAccountName: promtail
       automountServiceAccountToken: true
       containers:
