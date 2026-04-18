@@ -7,11 +7,11 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: demo-app
+  repository: paragjo/demo-app
   # This sets the pull policy for images.
-  pullPolicy: Never
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: latest
+  tag: "v1"
 
 # This is custom attribute, key for GitOps switch --set failureMode=cpu-spike
 failureMode: none
