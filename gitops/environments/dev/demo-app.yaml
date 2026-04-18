@@ -20,8 +20,8 @@ spec:
     namespace: demo-app-dev
 
   syncPolicy: {}
-#    automated:
-#      prune: true
-#      selfHeal: true
-#    syncOptions:
-#      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
