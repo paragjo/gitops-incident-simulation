@@ -41,7 +41,7 @@ This project simulates real-world incidents (memory leaks, crash loops, resource
                           v
                 +--------------------+
                 | Kubernetes Cluster |
-                | (GKE / EKS)        |
+                |       (GKE)        |
                 +--------------------+
                   |       |        |
                   v       v        v
@@ -108,9 +108,11 @@ gitops-incident-simulation/
 ## 📸 Demo
 
 * Grafana dashboards screenshots
-### Restart Detection & Alerts
+
+Restart Detection & Alerts
 
 ![Dashboard](docs/images/grafana-dashboeard-1.jpg)
+
 ![Dashboard](docs/images/grafana-dashboard-2.jpg)
 
 ---
