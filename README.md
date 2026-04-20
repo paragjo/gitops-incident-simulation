@@ -75,7 +75,7 @@ gitops-incident-simulation/
 ├── app/                # Microservice code
 ├── chaos/              # Failure simulation
 ├── observability/      # Prometheus, Grafana, Loki
-├── ci-cd/              # GitLab pipelines
+├── ci-cd/              # Github Actions
 └── docs/               # Architecture & scenarios
 ```
 
@@ -87,7 +87,7 @@ gitops-incident-simulation/
 * **Infrastructure**: Terraform
 * **Container Orchestration**: Kubernetes
 * **GitOps**: ArgoCD
-* **CI/CD**: GitLab CI (Or Github Actions TBD)
+* **CI/CD**: Github Actions
 * **Monitoring**: Prometheus + Grafana
 * **Logging**: Loki
 * **Alerting**: Alertmanager (Currently disabled for local due to resource crunch)
