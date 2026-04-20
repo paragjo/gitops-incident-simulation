@@ -105,11 +105,13 @@ gitops-incident-simulation/
 
 ---
 
-## 📸 Demo (To Be Added)
+## 📸 Demo
 
 * Grafana dashboards screenshots
-* Alert triggers
-* CrashLoop / OOMKilled scenarios
+### Restart Detection & Alerts
+
+![Dashboard](docs/images/grafana-dashboeard-1.jpg)
+![Dashboard](docs/images/grafana-dashboard-2.jpg)
 
 ---
 
