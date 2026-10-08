@@ -15,7 +15,7 @@ image:
   tag: "2f2d1d4d58cc5c7b86e528fb2c3b5f9c472c4a5d"
 
 # This is custom attribute, key for GitOps switch --set failureMode=health-fail
-failureMode: health-fail
+failureMode: none
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
