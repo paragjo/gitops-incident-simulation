@@ -58,4 +58,13 @@ echo "==> Verifying Argo CD"
 kubectl get pods -n "$ARGOCD_NAMESPACE"
 
 echo
+echo "==> Restoring GitOps Applications"
+
+kubectl apply -f gitops/environments/dev/demo-app.yaml
+kubectl apply -f observability/prometheus/environments/dev/prometheus.yaml
+kubectl apply -f observability/grafana/environments/dev/grafana.yaml
+kubectl apply -f observability/loki/environments/dev/loki.yaml
+kubectl apply -f observability/promtail/environments/dev/promtail.yaml
+
+echo
 echo "GKE environment is ready."
