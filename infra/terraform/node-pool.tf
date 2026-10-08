@@ -3,7 +3,10 @@ resource "google_container_node_pool" "gitops" {
   location = "asia-south1-a"
   cluster  = google_container_cluster.gitops.name
 
-  node_count = 1
+  autoscaling {
+    min_node_count = 1
+    max_node_count = 2
+  }
 
   node_config {
     machine_type = "e2-medium"
