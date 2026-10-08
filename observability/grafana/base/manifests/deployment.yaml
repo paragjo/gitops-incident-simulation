@@ -18,6 +18,9 @@ spec:
           image: grafana/grafana:10.4.0
           ports:
             - containerPort: 3000
+          volumeMounts:
+            - name: grafana-datasource
+              mountPath: /etc/grafana/provisioning/datasources
           resources:
             requests:
               cpu: 50m
@@ -25,3 +28,7 @@ spec:
             limits:
               cpu: 200m
               memory: 256Mi
+      volumes:
+        - name: grafana-datasource
+          configMap:
+            name: grafana-datasource
