@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alerting
+  namespace: monitoring
+data:
+  alerting.yaml: |
+    apiVersion: 1
+    contactPoints:
+      - orgId: 1
+        name: gmail-test
+        receivers:
+          - uid: ag0svn7i0v7k1a
+            type: email
+            settings:
+              addresses: joshiparag30@gmail.com
+              singleEmail: false
+            disableResolveMessage: false
+    policies:
+      - orgId: 1
+        receiver: grafana-default-email
+        group_by:
+          - grafana_folder
+          - alertname
+        group_wait: 30s
+        group_interval: 5m
+        routes:
+          - receiver: gmail-test
+            object_matchers:
+              - ["notify", "=", "email"]
+    groups:
+      - orgId: 1
+        name: demo-app-health
+        folder: GitOps
+        interval: 1m
+        rules:
+          - uid: demo-app-memory-growth
+            title: Sustained demo-app heap growth
+            condition: A
+            data:
+              - refId: A
+                queryType: ""
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  editorMode: code
+                  exemplar: false
+                  expr: 'delta(process_heap_bytes{job="demo-app"}[10m]) > 20000000'
+                  format: time_series
+                  instant: true
+                  intervalMs: 1000
+                  legendFormat: __auto
+                  maxDataPoints: 43200
+                  range: false
+                  refId: A
+            for: 2m
+            noDataState: NoData
+            execErrState: Error
+            labels:
+              notify: email
