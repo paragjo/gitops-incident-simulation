@@ -11,8 +11,8 @@ image:
   # This sets the pull policy for images.
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  # tag: "b1fed7a8e8788fee3c67de37a29b7422ccbbe1ec"
-  tag: "b1fed7a8e8788fee3c67de37a29b7422ccbbe1ec"
+  # tag: "30f96a2958d66aa8b3de7640fb0a7f1a0f8d7ff8"
+  tag: "30f96a2958d66aa8b3de7640fb0a7f1a0f8d7ff8"
 
 # This is custom attribute, key for GitOps switch --set failureMode=health-fail
 failureMode: memory-leak
