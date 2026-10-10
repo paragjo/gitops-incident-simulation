@@ -21,6 +21,10 @@ spec:
           volumeMounts:
             - name: grafana-datasource
               mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboard-provisioning
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: grafana-dashboard
+              mountPath: /var/lib/grafana/dashboards
           resources:
             requests:
               cpu: 50m
@@ -32,3 +36,9 @@ spec:
         - name: grafana-datasource
           configMap:
             name: grafana-datasource
+        - name: grafana-dashboard-provisioning
+          configMap:
+            name: grafana-dashboard-provisioning
+        - name: grafana-dashboard
+          configMap:
+            name: grafana-dashboard
