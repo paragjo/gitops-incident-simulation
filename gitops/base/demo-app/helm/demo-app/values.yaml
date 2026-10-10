@@ -11,8 +11,8 @@ image:
   # This sets the pull policy for images.
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  # tag: "30f96a2958d66aa8b3de7640fb0a7f1a0f8d7ff8"
-  tag: "30f96a2958d66aa8b3de7640fb0a7f1a0f8d7ff8"
+  # tag: "60f5b2e1152cf5d14192056ddde90591f72ba0db"
+  tag: "60f5b2e1152cf5d14192056ddde90591f72ba0db"
 
 # This is custom attribute, key for GitOps switch --set failureMode=health-fail
 failureMode: none
