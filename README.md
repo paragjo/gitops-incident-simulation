@@ -99,7 +99,7 @@ gitops-incident-simulation/
 * [x] Kubernetes app deployment -- Tested on GKE
 * [x] Failure simulation -- Tested on GKE
 * [x] GitOps implementation (ArgoCD) -- Tested on GKE
-* [ ] Observability stack integration on GKE
+* [x] Observability stack integration on GKE
 * [x] Terraform-based GKE provisioning
 * [x] GitOps incident simulation and recovery
 * [ ] Multi-environment setup
