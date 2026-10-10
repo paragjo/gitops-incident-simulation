@@ -2,6 +2,8 @@
 
 set -e
 
+cd "$(dirname "$0")/.."
+
 PROJECT_ID="$(gcloud config get-value project 2>/dev/null)"
 CLUSTER_NAME="gitops-gke"
 CLUSTER_ZONE="asia-south1-a"

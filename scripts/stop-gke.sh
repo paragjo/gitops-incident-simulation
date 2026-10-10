@@ -2,6 +2,9 @@
 
 set -e
 
+# Ensure the script works regardless of the current directory.
+cd "$(dirname "$0")/.."
+
 echo "========================================"
 echo "Stopping GitOps GKE environment"
 echo "========================================"
