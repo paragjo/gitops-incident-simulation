@@ -25,7 +25,7 @@ spec:
 
           args:
             - -config.file=/etc/promtail/promtail.yaml
-            - -log.level=debug
+            - -log.level=info
 
           resources:
             limits:
