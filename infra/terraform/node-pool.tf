@@ -9,7 +9,7 @@ resource "google_container_node_pool" "gitops" {
   }
 
   node_config {
-    machine_type = "e2-medium"
+    machine_type = "e2-standard-2"
     spot         = true
 
     oauth_scopes = [
