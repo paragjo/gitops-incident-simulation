@@ -62,6 +62,30 @@ kubectl get pods -n "$ARGOCD_NAMESPACE"
 echo
 echo "==> Restoring GitOps Applications"
 
+echo
+echo "==> Configuring Grafana SMTP credentials"
+
+kubectl create namespace monitoring \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+read -r -p "Gmail address: " GMAIL_USER
+read -r -s -p "Gmail App Password: " GMAIL_APP_PASSWORD
+echo
+
+if [[ -z "$GMAIL_USER" || -z "$GMAIL_APP_PASSWORD" ]]; then
+  echo "ERROR: Gmail address and app password are required."
+  unset GMAIL_USER GMAIL_APP_PASSWORD
+  exit 1
+fi
+
+kubectl create secret generic grafana-smtp \
+  -n monitoring \
+  --from-literal=username="$GMAIL_USER" \
+  --from-literal=password="$GMAIL_APP_PASSWORD" \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+unset GMAIL_USER GMAIL_APP_PASSWORD
+
 kubectl apply -f gitops/environments/dev/demo-app.yaml
 kubectl apply -f observability/prometheus/environments/dev/prometheus.yaml
 kubectl apply -f observability/grafana/environments/dev/grafana.yaml
