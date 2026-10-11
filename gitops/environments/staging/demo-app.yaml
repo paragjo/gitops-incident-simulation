@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app-staging
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/paragjo/gitops-incident-simulation
+    targetRevision: HEAD
+    path: gitops/base/demo-app/helm/demo-app
+
+    helm:
+      releaseName: demo-app-staging
+      valueFiles:
+        - values.yaml
+      valuesObject:
+        replicaCount: 1
+        failureMode: none
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-app-staging
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

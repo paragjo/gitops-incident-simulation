@@ -87,6 +87,7 @@ kubectl create secret generic grafana-smtp \
 unset GMAIL_USER GMAIL_APP_PASSWORD
 
 kubectl apply -f gitops/environments/dev/demo-app.yaml
+kubectl apply -f gitops/environments/staging/demo-app.yaml
 kubectl apply -f observability/prometheus/environments/dev/prometheus.yaml
 kubectl apply -f observability/grafana/environments/dev/grafana.yaml
 kubectl apply -f observability/loki/environments/dev/loki.yaml
