@@ -60,3 +60,32 @@ data:
             execErrState: Error
             labels:
               notify: email
+          - uid: demo-app-down
+            title: Demo app unavailable (dev or staging)
+            condition: A
+            data:
+              - refId: A
+                queryType: ""
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  editorMode: code
+                  exemplar: false
+                  expr: 'up{job="demo-app"} == 0'
+                  format: time_series
+                  instant: true
+                  intervalMs: 1000
+                  legendFormat: __auto
+                  maxDataPoints: 43200
+                  range: false
+                  refId: A
+            for: 2m
+            noDataState: OK
+            execErrState: Error
+            labels:
+              notify: email
+            annotations:
+              summary: "Demo app target is down"
+              description: "Prometheus has reported {{ $labels.instance }} as down for at least 2 minutes."
