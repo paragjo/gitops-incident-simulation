@@ -18,6 +18,8 @@ spec:
       valuesObject:
         replicaCount: 1
         failureMode: none
+        image:
+          tag: "9a92e27c2fb704e376e1b3922176af66bbc09811"
 
   destination:
     server: https://kubernetes.default.svc
