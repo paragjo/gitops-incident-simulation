@@ -106,6 +106,8 @@ A Grafana email contact point and notification policy are also configured. Their
 - **Deployment management:** Argo CD and Helm.
 - **Image pipeline:** GitHub Actions builds and publishes the demo application image and updates the chart image tag on pushes to `main`.
 - **Environments:** Dev and staging are configured; production is not implemented.
+- **Staging promotion:** Dev follows the image tag updated by GitHub Actions. Staging pins its image tag independently in `gitops/environments/staging/demo-app.yaml`. Promote a validated dev image by updating the staging `image.tag` to the same Git SHA and committing the change. Argo CD then reconciles staging automatically.
+- **Release validation:** Validate the image in dev before promoting it to staging. End-to-end staging promotion validation is pending.
 - **Cost control:** `scripts/start-gke.sh` starts the environment, and `scripts/stop-gke.sh` destroys Terraform-managed infrastructure when the environment is no longer needed.
 
 ---
