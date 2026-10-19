@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: demo-app-environments
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  syncPolicy:
+    applicationsSync: create-update
+    preserveResourcesOnDeletion: true
+  generators:
+    - git:
+        repoURL: https://github.com/paragjo/gitops-incident-simulation
+        revision: HEAD
+        files:
+          - path: gitops/environments/dev/demo-app.yaml
+          - path: gitops/environments/staging/demo-app.yaml
+  template:
+    metadata:
+      name: '{{ .metadata.name }}'
+      namespace: '{{ .metadata.namespace }}'
+    spec:
+      project: '{{ .spec.project }}'
+      source:
+        repoURL: '{{ .spec.source.repoURL }}'
+        targetRevision: '{{ .spec.source.targetRevision }}'
+        path: '{{ .spec.source.path }}'
+      destination:
+        server: '{{ .spec.destination.server }}'
+        namespace: '{{ .spec.destination.namespace }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+  templatePatch: |
+    spec: {{ omit .spec "project" | toJson }}
