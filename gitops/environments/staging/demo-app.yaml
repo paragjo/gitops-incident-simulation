@@ -19,7 +19,7 @@ spec:
         replicaCount: 1
         failureMode: none
         image:
-          tag: "7e502b9c2eb02921b4788a36f419f8b87567348b"
+          tag: "c48cfdfefbc59967925c24c8dfaa6758de51e772"
 
   destination:
     server: https://kubernetes.default.svc
