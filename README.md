@@ -96,7 +96,9 @@ The repository provisions two Grafana alert rules:
 
 A Grafana email contact point and notification policy are also configured. Their configuration does not, by itself, establish successful delivery for every alert scenario.
 
-**Operational note:** In the current setup, changing the alert-provisioning ConfigMap does not automatically restart Grafana or reload the alerting configuration. Manually restart the Grafana deployment after alert-provisioning changes.
+**Operational note:** Alert-provisioning ConfigMap changes require the Grafana deployment to be restarted before the updated configuration takes effect. Argo CD reconciles the provisioned configuration from Git, so commit and push changes to the repository.
+
+**Verification:** During testing on GKE, the availability alert entered Firing for the dev target while staging remained Normal. The configured email notification was received, including the firing dev instance and alert values.
 
 ## ⚙️ Infrastructure and Delivery
 
