@@ -73,7 +73,7 @@ data:
                 model:
                   editorMode: code
                   exemplar: false
-                  expr: 'up{job="demo-app"} == 0'
+                  expr: 'up{job="demo-app"} == bool 0'
                   format: time_series
                   instant: true
                   intervalMs: 1000
