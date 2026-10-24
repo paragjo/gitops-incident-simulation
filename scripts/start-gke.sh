@@ -4,9 +4,30 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-PROJECT_ID="$(gcloud config get-value project 2>/dev/null)"
-CLUSTER_NAME="gitops-gke"
-CLUSTER_ZONE="asia-south1-a"
+GITHUB_ACTIONS_MODE="${GITHUB_ACTIONS:-false}"
+
+if [[ "$GITHUB_ACTIONS_MODE" == "true" ]]; then
+  : "${GCP_PROJECT_ID:?GCP_PROJECT_ID must be configured}"
+  : "${GCP_REGION:?GCP_REGION must be configured}"
+  : "${GCP_ZONE:?GCP_ZONE must be configured}"
+  : "${GKE_CLUSTER_NAME:?GKE_CLUSTER_NAME must be configured}"
+
+  PROJECT_ID="$GCP_PROJECT_ID"
+  REGION="$GCP_REGION"
+  CLUSTER_ZONE="$GCP_ZONE"
+  CLUSTER_NAME="$GKE_CLUSTER_NAME"
+else
+  PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}"
+  REGION="${GCP_REGION:-asia-south1}"
+  CLUSTER_ZONE="${GCP_ZONE:-asia-south1-a}"
+  CLUSTER_NAME="${GKE_CLUSTER_NAME:-gitops-gke}"
+fi
+
+export TF_VAR_project_id="$PROJECT_ID"
+export TF_VAR_region="$REGION"
+export TF_VAR_zone="$CLUSTER_ZONE"
+export TF_VAR_cluster_name="$CLUSTER_NAME"
+
 ARGOCD_NAMESPACE="argocd"
 ARGOCD_VERSION="v3.5.3"
 
@@ -19,10 +40,18 @@ echo "Cluster: $CLUSTER_NAME"
 echo
 
 echo "==> Terraform init"
-terraform -chdir=infra/terraform init
+if [[ "$GITHUB_ACTIONS_MODE" == "true" ]]; then
+  terraform -chdir=infra/terraform init -input=false
+else
+  terraform -chdir=infra/terraform init
+fi
 
 echo "==> Terraform apply"
-terraform -chdir=infra/terraform apply
+if [[ "$GITHUB_ACTIONS_MODE" == "true" ]]; then
+  terraform -chdir=infra/terraform apply -input=false -auto-approve
+else
+  terraform -chdir=infra/terraform apply
+fi
 
 echo "==> Configuring kubectl"
 gcloud container clusters get-credentials "$CLUSTER_NAME" \
@@ -68,8 +97,15 @@ echo "==> Configuring Grafana SMTP credentials"
 kubectl create namespace monitoring \
   --dry-run=client -o yaml | kubectl apply -f -
 
-read -r -p "Gmail address: " GMAIL_USER
-read -r -s -p "Gmail App Password: " GMAIL_APP_PASSWORD
+if [[ "$GITHUB_ACTIONS_MODE" == "true" ]]; then
+  GMAIL_USER="${GMAIL_USER:-}"
+  GMAIL_APP_PASSWORD="${GMAIL_APP_PASSWORD:-}"
+else
+  read -r -p "Gmail address: " GMAIL_USER
+  read -r -s -p "Gmail App Password: " GMAIL_APP_PASSWORD
+  echo
+fi
+
 echo
 
 if [[ -z "$GMAIL_USER" || -z "$GMAIL_APP_PASSWORD" ]]; then
