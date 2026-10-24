@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "google" {
-  project = "project-811ca46f-289b-42fd-9b9"
-  region  = "asia-south1"
-  zone    = "asia-south1-a"
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
 }

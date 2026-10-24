@@ -1,6 +1,6 @@
 resource "google_container_cluster" "gitops" {
-  name     = "gitops-gke"
-  location = "asia-south1-a"
+  name     = var.cluster_name
+  location = var.zone
 
   network    = google_compute_network.gitops.id
   subnetwork = google_compute_subnetwork.gitops.id

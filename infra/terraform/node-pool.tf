@@ -1,6 +1,6 @@
 resource "google_container_node_pool" "gitops" {
   name     = "gitops-node-pool"
-  location = "asia-south1-a"
+  location = var.zone
   cluster  = google_container_cluster.gitops.name
 
   autoscaling {

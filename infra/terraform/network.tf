@@ -6,7 +6,7 @@ resource "google_compute_network" "gitops" {
 resource "google_compute_subnetwork" "gitops" {
   name          = "gitops-gke-subnet"
   ip_cidr_range = "10.10.0.0/24"
-  region        = "asia-south1"
+  region        = var.region
   network       = google_compute_network.gitops.id
 
   secondary_ip_range {
