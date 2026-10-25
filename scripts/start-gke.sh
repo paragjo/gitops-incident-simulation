@@ -76,8 +76,33 @@ fi
 
 echo "==> Ensuring Argo CD ApplicationSet CRD"
 
-curl -fsSL "https://raw.githubusercontent.com/argoproj/argo-cd/$ARGOCD_VERSION/manifests/install.yaml"   | sed -n '7114,/^---$/p'   > /tmp/applicationset-crd.yaml
+ARGOCD_MANIFEST_URL="https://raw.githubusercontent.com/argoproj/argo-cd/$ARGOCD_VERSION/manifests/install.yaml"
+ARGOCD_MANIFEST="$(mktemp)"
+trap 'rm -f "$ARGOCD_MANIFEST" /tmp/applicationset-crd.yaml' EXIT
 
+curl -fsSL "$ARGOCD_MANIFEST_URL" -o "$ARGOCD_MANIFEST"
+
+awk '
+  /^---[[:space:]]*$/ {
+    if (doc ~ /kind: CustomResourceDefinition/ && doc ~ /name: applicationsets\.argoproj\.io/) {
+      printf "%s", doc
+      found = 1
+      exit
+    }
+    doc = ""
+    next
+  }
+  { doc = doc $0 "\n" }
+  END {
+    if (!found && doc ~ /kind: CustomResourceDefinition/ && doc ~ /name: applicationsets\.argoproj\.io/) {
+      printf "%s", doc
+      found = 1
+    }
+    if (!found) exit 1
+  }
+' "$ARGOCD_MANIFEST" > /tmp/applicationset-crd.yaml
+
+test -s /tmp/applicationset-crd.yaml
 kubectl apply --server-side -f /tmp/applicationset-crd.yaml
 
 echo "==> Waiting for Argo CD server"

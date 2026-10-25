@@ -8,6 +8,10 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: gitops-gke-lifecycle
+  cancel-in-progress: false
+
 jobs:
   start:
     name: Start GKE infrastructure

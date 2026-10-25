@@ -50,11 +50,22 @@ echo "Review the plan carefully before confirming."
 echo
 
 if [[ "$GITHUB_ACTIONS_MODE" == "true" ]]; then
-  terraform -chdir=infra/terraform destroy -input=false -auto-approve
+  terraform -chdir=infra/terraform destroy \
+    -input=false \
+    -auto-approve \
+    -target=google_container_node_pool.gitops \
+    -target=google_container_cluster.gitops \
+    -target=google_compute_subnetwork.gitops \
+    -target=google_compute_network.gitops
 else
-  terraform -chdir=infra/terraform destroy
+  terraform -chdir=infra/terraform destroy \
+    -target=google_container_node_pool.gitops \
+    -target=google_container_cluster.gitops \
+    -target=google_compute_subnetwork.gitops \
+    -target=google_compute_network.gitops
 fi
 
 echo
-echo "GKE environment has been destroyed."
+echo "GKE infrastructure has been destroyed."
+echo "Persistent GitHub Actions identity and Terraform state are retained."
 echo "Git repository remains intact."

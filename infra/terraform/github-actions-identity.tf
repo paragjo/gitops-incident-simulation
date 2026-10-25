@@ -50,6 +50,12 @@ resource "google_project_iam_member" "github_actions_container_admin" {
   member  = google_service_account.github_actions_gke_lifecycle.member
 }
 
+resource "google_project_iam_member" "github_actions_network_admin" {
+  project = var.project_id
+  role    = "roles/compute.networkAdmin"
+  member  = google_service_account.github_actions_gke_lifecycle.member
+}
+
 resource "google_storage_bucket_iam_member" "github_actions_state" {
   bucket = "paragjo-gitops-tfstate"
   role   = "roles/storage.objectAdmin"
