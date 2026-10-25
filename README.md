@@ -1,175 +1,177 @@
-# 🚀 GitOps-Based Incident Simulation & Monitoring System
 
-## 📌 Overview
+# 🚀 GitOps Incident Simulation
 
-This project demonstrates how **GitOps, Kubernetes, and observability** tools can be combined to deploy an application, simulate operational failures, and monitor application and cluster health.
+**A cloud-native DevOps project demonstrating GitOps delivery, infrastructure lifecycle automation, controlled staging promotion, and Kubernetes incident observability.**
 
-The demo application runs on **Google Kubernetes Engine (GKE)**, with **Argo CD** managing deployments from Git. **Prometheus** collects metrics, **Grafana** provides dashboards and alerting, and **Loki with Promtail** centralizes application logs.
+[![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-GKE-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+[![Argo CD](https://img.shields.io/badge/GitOps-Argo%20CD-EF7B4D?logo=argo&logoColor=white)](https://argo-cd.readthedocs.io/)
+[![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://docs.github.com/actions)
 
-The goal is to explore practical DevOps and SRE workflows: managing deployments declaratively, introducing controlled failures, observing their effects, and using metrics, logs, and alerts to investigate application health.
+## 🎯 Overview
 
+GitOps Incident Simulation is a hands-on platform engineering project that brings together application delivery, infrastructure automation, environment promotion, and operational troubleshooting.
 
----
+The platform combines Terraform-managed Google Kubernetes Engine (GKE), GitHub Actions, Workload Identity Federation (WIF), Argo CD, Helm, and a Prometheus/Grafana/Loki observability stack. Separate development and staging environments demonstrate controlled promotion and environment-specific configuration.
 
 ## 🏗️ Architecture
 
+```mermaid
+flowchart TD
+    Dev[Developer] --> Git[GitHub Repository]
+    Git --> Build[GitHub Actions<br/>Build and Publish Image]
+    Build --> Registry[Container Image Registry]
+    Build --> Tag[Update GitOps Image Tag]
+    Tag --> Argo[Argo CD]
+    Argo --> DevEnv[Development]
+    Argo --> Stage[Staging]
+    DevEnv --> Obs[Prometheus / Grafana / Loki]
+    Stage --> Obs
+
+    Manual[Manual Start / Stop Workflows] --> WIF[GitHub OIDC + WIF]
+    WIF --> TF[Terraform + GCS Remote State]
+    TF --> GKE[GKE, Node Pool and Network]
+    GKE --> Argo
+    Approval[Staging Promotion Approval] --> Stage
 ```
-                GitHub Repository
-                        |
-             +----------+----------+
-             |                     |
-             v                     v
-       GitHub Actions            Argo CD
-       Build & Publish             |
-       Container Image             v
-             |                 GKE Cluster
-             +---------------->    |
-                              +-----+------+
-                              |            |
-                              v            v
-                         Demo App     Observability
-                        Dev/Staging        |
-                              |             |
-                    +---------+-------+     |
-                    |         |       |     |
-                    v         v       v     |
-                Prometheus  Promtail  Failure Modes
-                    |         |
-                    v         v
-                 Grafana <--- Loki
-                    |
-             Dashboards & Alerts
-```
-Terraform provisions the GKE infrastructure. Argo CD reconciles the application and observability resources from Git, while the monitoring stack provides visibility into cluster metrics, application logs, and configured alert conditions.
 
----
+### 🧰 Technology stack
 
-## What This Project Demonstrates
+| Area | Technologies |
+|---|---|
+| Cloud infrastructure | Google Cloud, GKE, VPC, subnet |
+| Infrastructure as Code | Terraform, Google Cloud Storage remote state |
+| CI/CD and lifecycle automation | GitHub Actions, manual Start/Stop workflows |
+| Cloud authentication | GitHub OIDC, Workload Identity Federation, IAM |
+| GitOps and packaging | Argo CD ApplicationSet, Helm |
+| Application delivery | Docker, SHA-tagged images, container registry |
+| Observability | Prometheus, Grafana, Loki, Promtail |
+| Incident simulation | Configurable application failure modes |
 
-- **GitOps deployments:** Manage Kubernetes applications and observability components declaratively through Git and Argo CD.
-- **Multi-environment deployments:** Run separate dev and staging instances of the demo application using a shared Helm chart.
-- **Incident simulation:** Introduce application failures through configurable failure modes and observe their effects.
-- **Metrics and dashboards:** Use Prometheus and Grafana to monitor node CPU, node memory, and Prometheus scrape health.
-- **Centralized logging:** Use Promtail and Loki to collect pod logs and investigate application behavior through Grafana.
-- **Alerting:** Configure Grafana-managed alerts for sustained application heap growth and application availability.
-- **Infrastructure lifecycle management:** Use Terraform-backed scripts to provision and destroy the GKE environment, helping control cloud costs.
+## ⚙️ Engineering highlights
 
----
+### 🔄 GitOps delivery and environment promotion
 
-## 🧪 Incident Scenarios
+- Git is the source of truth for application deployment configuration; Argo CD reconciles the desired state.
+- An Argo CD ApplicationSet manages separate development and staging applications.
+- The image workflow builds and publishes a commit-SHA-tagged image and updates the GitOps image tag.
+- Staging pins its revision independently and uses a manual approval-gated promotion workflow.
+- Promotion validates SHA format and commit ancestry on `main`. It does **not** independently verify development health, test results, or image existence.
 
-The application supports configurable failure modes to demonstrate different operational symptoms.
+### ☁️ Cost-conscious infrastructure lifecycle
 
-| Scenario                | Simulated behavior                                      | What to investigate |
-| ----------------------- | ------------------------------------------------------- | --- |
-| Memory leak             | Allocates and retains memory periodically.              | Heap growth in Prometheus and Grafana; sustained growth can lead to an OOM kill depending on runtime behavior and the container memory limit. |
-| Crash loop              | Exits during startup.                                   | Container restarts, pod status, and application logs. |
-| CPU spike               | A request to `/api` triggers a five-second busy loop.   | CPU behavior during the request. No CPU-specific alert is configured. |
-| Health check failure    | `/health` returns HTTP 500.                             | Probe failures and application health. |
-| Increased latency       | `/api` responses are delayed by three seconds.          | Request behavior and application logs. |
-| Request-triggered crash | A request to `/api` terminates the application process. | Pod restarts and logs around the failure. |
+- Terraform manages the GKE cluster, node pool, VPC, and subnet.
+- A Google Cloud Storage backend keeps Terraform state separate from the runtime infrastructure.
+- GitHub Actions authenticates to Google Cloud through OIDC and Workload Identity Federation, avoiding long-lived service-account keys.
+- A protected GitHub Environment (`gke-lifecycle`) gates lifecycle operations.
+- Persistent bootstrap identity and state resources are separated from disposable runtime infrastructure.
 
-These scenarios provide a controlled way to explore how application-level failures appear in Kubernetes and the observability stack. The expected symptoms depend on the specific failure mode and runtime conditions.
+The Start workflow provisions infrastructure, configures Argo CD, creates the Grafana SMTP secret, and applies GitOps and observability resources. It does not wait for every Argo CD application to become healthy.
 
----
+The Stop workflow destroys the Terraform-managed runtime infrastructure while preserving the remote state bucket and separately managed WIF/IAM bootstrap resources.
 
-## 👁️🔔 Observability and Alerting
+See the [Bootstrap IAM and WIF guide](docs/BOOTSTRAP-IAM-WIF.md).
 
-### 📈 Metrics and dashboards
+### 🧪 Incident simulation
 
-Prometheus scrapes the demo application in dev and staging, along with node-exporter. Grafana provides a dashboard for:
+The demo application supports configurable failure modes:
 
-- Node CPU usage
-- Node memory usage
-- Prometheus scrape health
+- `memory-leak`
+- `crash-loop`
+- `cpu-spike`
+- `health-fail`
+- `latency`
+- Request-triggered crash
 
-### 📄 Logs
+These scenarios provide opportunities to investigate application symptoms, Kubernetes health, metrics, logs, and alert behavior. The development `memory-leak` scenario was intentionally used during incident testing.
 
-Promtail discovers Kubernetes pod logs and forwards them to Loki. Grafana's Loki data source allows logs to be explored by labels such as namespace, making it possible to investigate application startup, requests, and failure-related events.
+### 📊 Observability and alerting
 
-### 🔔 Grafana-managed alerts
+- **Prometheus** collects application and infrastructure metrics.
+- **Grafana** provides dashboards, alert rules, and notifications.
+- **Loki and Promtail** provide centralized log collection.
+- Alert rules cover application availability and memory growth.
 
-The repository provisions two Grafana alert rules:
+A verified availability-alert test showed the development alert firing while staging remained normal, and an email notification was received. This confirms that specific test scenario; it does not imply that every alert or failure mode has been tested.
 
-- **Sustained demo-app heap growth:** Evaluates heap growth over a 10-minute query window, with a 2-minute pending period.
-- **Demo app unavailable:** Detects a dev or staging scrape target reporting down for 2 minutes under the Prometheus `demo-app` job.
+## ✅ Verified results
 
-A Grafana email contact point and notification policy are also configured. Their configuration does not, by itself, establish successful delivery for every alert scenario.
-
-**Operational note:** Alert-provisioning ConfigMap changes require the Grafana deployment to be restarted before the updated configuration takes effect. Argo CD reconciles the provisioned configuration from Git, so commit and push changes to the repository.
-
-**Verification:** During testing on GKE, the availability alert entered Firing for the dev target while staging remained Normal. The configured email notification was received, including the firing dev instance and alert values.
-
-## ⚙️ Infrastructure and Delivery
-
-- **Cloud platform:** Google Kubernetes Engine (GKE).
-- **Infrastructure as Code:** Terraform provisions the cluster and node pool.
-- **Compute:** Spot `e2-standard-2` instances, configured to autoscale from one to two nodes.
-- **Deployment management:** Argo CD and Helm.
-- **Image pipeline:** GitHub Actions builds and publishes the demo application image and updates the chart image tag on pushes to `main`.
-- **Environments:** Dev and staging are configured; production is not implemented.
-- **Staging promotion:** Dev follows the image tag updated by GitHub Actions. Staging pins its image tag independently in `gitops/environments/staging/demo-app.yaml`. The `Approve and Promote to Staging` GitHub Actions workflow validates a candidate Git SHA, requires approval through the GitHub `staging` environment, revalidates the SHA, and updates the staging image tag. The `demo-app-environments` ApplicationSet tracks only the dev and staging Application manifests and reconciles their specs from Git; the child Applications then reconcile their workloads. The local helper `bash scripts/promote-staging.sh <validated-image-git-sha>` remains available for manual manifest updates but does not invoke the GitHub approval gate. End-to-end promotion validation is pending.
-- **Release validation:** Validate the image in dev before promoting it to staging. End-to-end staging promotion validation is pending.
-- **Cost control:** `scripts/start-gke.sh` starts the environment, and `scripts/stop-gke.sh` destroys Terraform-managed infrastructure when the environment is no longer needed.
-
----
+| Capability | Result |
+|---|---|
+| Development and staging | Both Argo CD applications were observed Synced and Healthy during validation. |
+| Controlled staging promotion | The approval gate was verified: the development revision remained out of staging until approval, then staging updated to the approved revision. |
+| Environment isolation | A development-only `memory-leak` configuration change did not automatically change staging before approval. |
+| Alerting | The development availability alert fired while staging remained normal; an email notification was received. |
+| Infrastructure lifecycle | Start and Stop workflows were successfully exercised, including post-Stop verification. |
+| Infrastructure teardown | Terraform reported `Destroy complete! Resources: 4 destroyed`; the cluster, node pool, VPC, and subnet were verified absent. |
+| Persistent resources | The GCS state bucket, WIF pool/provider, service account, and bootstrap identity configuration were verified to remain available. |
+| Remote Terraform state | Post-Stop verification confirmed the remote state contained no remaining managed resources. |
 
 ## 📸 Screenshots
 
-### GKE Cluster
+### ☸️ GKE cluster
 
 ![GKE Cluster](docs/images/GKE-Cluster-1.jpg)
 
-### Grafana Dashboard on GKE
+*GKE cluster and node infrastructure.*
+
+### 📈 Grafana dashboard
 
 ![Grafana dashboard on GKE](docs/images/GKE-Grafana%20Dashboard.jpg)
 
-### Grafana Alert Rules on GKE
+*Monitoring dashboard for Kubernetes and application health.*
+
+### 🚨 Grafana alert rules
 
 ![Grafana alert rules on GKE](docs/images/GKE-Grafana%20Alert%20Rules.jpg)
 
-### Email Alert
+*Configured alert rules for application availability and memory growth.*
+
+### ✉️ Email alert notification
 
 ![Grafana email alert](docs/images/Email-Alert.jpg)
 
----
+*Email notification received during availability-alert validation.*
 
-## 📂 Repository Structure
+## 📁 Repository layout
 
-```
+```text
 .
-├── .github/workflows/     # Image build and publish workflow
-├── app/demo-app/          # Demo application and Dockerfile
+├── .github/workflows/       # Image build, staging promotion, GKE Start/Stop
+├── app/                     # Demo application and failure modes
 ├── gitops/
-│   ├── base/              # Shared Helm chart
-│   └── environments/      # Dev and staging Applications
-├── infra/terraform/       # GKE infrastructure
-├── observability/
-│   ├── grafana/
-│   ├── loki/
-│   ├── prometheus/
-│   └── promtail/
-├── scripts/               # GKE start and stop scripts
-├── chaos/                 # Placeholder
-└── ci-cd/                 # Placeholder
-
+│   ├── applicationset.yaml  # Development and staging applications
+│   ├── base/                # Shared application configuration
+│   └── environments/        # Environment-specific overrides
+├── infra/terraform/         # GKE and network lifecycle infrastructure
+├── scripts/                 # Local and CI lifecycle helpers
+├── docs/
+│   ├── BOOTSTRAP-IAM-WIF.md # Learner bootstrap guide
+│   └── images/              # Project screenshots
+└── README.md
 ```
 
+## 🚦 Getting started
+
+This repository is intended as a learning and portfolio project. Start with the [Bootstrap IAM and WIF guide](docs/BOOTSTRAP-IAM-WIF.md) to configure your own GCP project, remote Terraform state, federated identity, IAM permissions, and GitHub Environment.
+
+Before running lifecycle workflows, review the Terraform configuration, understand the IAM permissions being granted, and consider the expected cloud costs. Start provisions the runtime infrastructure and configures the platform; verify Argo CD application health separately. Stop removes the Terraform-managed runtime resources while preserving the bootstrap resources.
+
+## 💡 What this project demonstrates
+
+- Infrastructure as Code and remote state management
+- Keyless GitHub Actions authentication to Google Cloud
+- GitOps reconciliation with Argo CD and Helm
+- Controlled promotion between development and staging
+- Incident simulation and monitoring-based diagnosis
+- Cost-aware creation and teardown of cloud infrastructure
+
 ---
 
-## 💡 Why This Project Matters
+## 👤 About the Author
 
-Modern systems are not just about deployment — they are about **resilience and observability**.
+**Parag Joshi**
 
-This project demonstrates:
+DevOps Engineer | Cloud | Kubernetes | Terraform | CI/CD
 
-* How failures occur in distributed systems
-* How to detect them using real-world monitoring tools
-* How GitOps ensures consistent and automated recovery
-
----
-
-## 👨‍💻 Author
-
-**Parag** – Cloud native DevOps Engineer
-Specializing in Kubernetes, Terraform, and Observability
+Built this project to demonstrate practical skills in GitOps, infrastructure automation, Kubernetes operations, and observability.
